@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3">Partidas</h1>
+  {% if user.is_authenticated %}
+  <a href="{% url 'create_match' %}" class="btn btn-primary">Criar Partida</a>
+  {% endif %}
+</div>
+
+<ul class="list-group">
+  {% for match in matches %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div>
+      <strong>{{ match.game_name }}</strong>
+      <span class="text-muted">
+        ({{ match.current_players }}/{{ match.max_players }})
+      </span>
+    </div>
+
+    <div>
+      {% if user.is_authenticated %} {% if match.owner == user %}
+      <a
+        href="{% url 'update_match' match.id %}"
+        class="btn btn-sm btn-warning me-1"
+      >
+        Editar
+      </a>
+      <a href="{% url 'delete_match' match.id %}" class="btn btn-sm btn-danger">
+        Excluir
+      </a>
+      {% elif match.is_full %}
+      <span class="badge bg-secondary">Partida cheia</span>
+      {% elif user in match.player_users %}
+      <span class="badge bg-success">Você já entrou</span>
+      {% else %}
+      <a href="{% url 'join_match' match.id %}" class="btn btn-sm btn-success">
+        Entrar
+      </a>
+      {% endif %} {% endif %}
+    </div>
+  </li>
+  {% empty %}
+  <li class="list-group-item">Nenhuma partida disponível.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

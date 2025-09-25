@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="h3 mb-4">Criar Partida</h1>
+
+<form method="post" class="card p-4 shadow-sm">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Nome do Jogo</label>
+    <input type="text" name="game_name" class="form-control" required />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Plataforma</label>
+    <input type="text" name="platform" class="form-control" required />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Máx. Jogadores</label>
+    <input
+      type="number"
+      name="max_players"
+      class="form-control"
+      min="2"
+      required
+    />
+  </div>
+  <button type="submit" class="btn btn-primary">Criar</button>
+  <a href="{% url 'match_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

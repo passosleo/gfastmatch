@@ -1,0 +1,62 @@
+# Arquivos de sistema
+*.DS_Store
+*.swp
+*.swo
+*.bak
+*.tmp
+Thumbs.db
+
+# Arquivos Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtualenv
+.venv/
+venv/
+env/
+ENV/
+*.env
+*.venv
+
+# Arquivos do Django
+*.log
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+
+# Arquivos de migração (se quiser ignorar migrações iniciais, use com cuidado)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# IDEs e editores
+.vscode/
+.idea/
+*.iml
+
+# Cobertura de testes / pytest
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.tox/
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# Docker
+*.pid
+*.seed
+*.pid.lock
