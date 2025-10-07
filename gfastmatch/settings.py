@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 LOGIN_REDIRECT_URL = "/matches/"
 LOGOUT_REDIRECT_URL = "/matches/"
-
+LANGUAGE_CODE = "pt-br"
 
 # Application definition
 

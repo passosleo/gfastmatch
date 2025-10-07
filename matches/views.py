@@ -1,4 +1,6 @@
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Match, Player
@@ -50,3 +52,15 @@ def delete_match(request, match_id):
     match = get_object_or_404(Match, id=match_id, owner=request.user)
     match.delete()
     return redirect("match_list")
+
+
+def signup(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("match_list")
+    else:
+        form = UserCreationForm()
+    return render(request, "registration/signup.html", {"form": form})
