@@ -3,55 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404, redirect, render
 
+from matches.forms import MatchForm
+
 from .models import Match, Player
-
-
-def match_list(request):
-    matches = Match.objects.all().order_by("-created_at")
-    return render(request, "matches/match_list.html", {"matches": matches})
-
-
-@login_required
-def create_match(request):
-    if request.method == "POST":
-        game_name = request.POST["game_name"]
-        platform = request.POST["platform"]
-        max_players = int(request.POST["max_players"])
-        Match.objects.create(
-            game_name=game_name,
-            platform=platform,
-            max_players=max_players,
-            owner=request.user,
-        )
-        return redirect("match_list")
-    return render(request, "matches/create_match.html")
-
-
-@login_required
-def update_match(request, match_id):
-    match = get_object_or_404(Match, id=match_id, owner=request.user)
-    if request.method == "POST":
-        match.game_name = request.POST["game_name"]
-        match.platform = request.POST["platform"]
-        match.max_players = int(request.POST["max_players"])
-        match.save()
-        return redirect("match_list")
-    return render(request, "matches/update_match.html", {"match": match})
-
-
-@login_required
-def join_match(request, match_id):
-    match = get_object_or_404(Match, id=match_id)
-    if not match.is_full():
-        Player.objects.get_or_create(match=match, user=request.user)
-    return redirect("match_list")
-
-
-@login_required
-def delete_match(request, match_id):
-    match = get_object_or_404(Match, id=match_id, owner=request.user)
-    match.delete()
-    return redirect("match_list")
 
 
 def signup(request):
@@ -64,3 +18,73 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, "registration/signup.html", {"form": form})
+
+
+def match_list(request):
+    matches = Match.objects.all().order_by("-created_at")
+    return render(request, "matches/match_list.html", {"matches": matches})
+
+
+@login_required
+def match_detail(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    players = match.players.select_related("user").all()
+    return render(
+        request, "matches/match_detail.html", {"match": match, "players": players}
+    )
+
+
+@login_required
+def create_match(request):
+    if request.method == "POST":
+        form = MatchForm(request.POST)
+        if form.is_valid():
+            match = form.save(commit=False)
+            match.owner = request.user
+            match.save()
+
+            Player.objects.create(match=match, user=request.user)
+
+            return redirect("match_detail", match_id=match.id)
+    else:
+        form = MatchForm()
+    return render(request, "matches/create_match.html", {"form": form})
+
+
+@login_required
+def update_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id, owner=request.user)
+    if request.method == "POST":
+        form = MatchForm(request.POST, instance=match)
+        if form.is_valid():
+            form.save()
+            return redirect("match_list")
+    else:
+        form = MatchForm(instance=match)
+    return render(request, "matches/update_match.html", {"form": form, "match": match})
+
+
+@login_required
+def delete_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id, owner=request.user)
+    match.delete()
+    return redirect("match_list")
+
+
+@login_required
+def join_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    if not match.is_full():
+        Player.objects.get_or_create(match=match, user=request.user)
+    return redirect("match_list")
+
+
+@login_required
+def leave_match(request, match_id):
+    match = get_object_or_404(Match, id=match_id)
+    if match.owner == request.user:
+        match.delete()
+        return redirect("match_list")
+
+    Player.objects.filter(match=match, user=request.user).delete()
+    return redirect("match_detail", match_id=match.id)

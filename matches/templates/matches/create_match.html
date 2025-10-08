@@ -3,25 +3,14 @@
   <div class="card-header text-center fw-semibold">Criar Partida</div>
   <div class="card-body">
     <form method="post">
-      {% csrf_token %}
+      {% csrf_token %} {% for field in form %}
       <div class="mb-3">
-        <label class="form-label">Nome do Jogo</label>
-        <input type="text" name="game_name" class="form-control" required />
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }} {% if field.errors %}
+        <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+        {% endif %}
       </div>
-      <div class="mb-3">
-        <label class="form-label">Plataforma</label>
-        <input type="text" name="platform" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Máx. Jogadores</label>
-        <input
-          type="number"
-          name="max_players"
-          class="form-control"
-          min="2"
-          required
-        />
-      </div>
+      {% endfor %}
       <div class="d-flex justify-content-between">
         <a href="{% url 'match_list' %}" class="btn btn-secondary">Cancelar</a>
         <button type="submit" class="btn btn-accent">Criar</button>
